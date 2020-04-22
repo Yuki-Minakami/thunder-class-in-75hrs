@@ -2,18 +2,64 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <title>雷课堂</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+    <div style="display: flex;flex-direction: row;">
+      <div style="min-width: 250px;">
+        <span id="name" style="display: none;">无名</span> 
+        <textarea style="width:100%;height:400px" readonly="readonly"></textarea>
+        <br/>
+        <div style="display: flex; flex-direction: row;">
+          <textarea style="width: 80%;height: 100px;"  type="text"></textarea>
+          <div>
+            <button id="sendBtn" >发送</button>
+            <button id="liveBtn" >共享屏幕</button>
+          </div>
+        </div>
+      </div>
+      <div style="display: none; width:1280px;height: 720px;" id="liveBlock">
+        <button id="endLive" >结束分享</button>
+        <video id="live">
+          your browser does not support the video tag
+        </video>
+      </div>
+    </div>
 
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
+
+    
   </body>
+  <script>
+    // 连接WebSocket服务器
+    var name = Math.random().toString(36).substr(2);
+
+    const socket = new WebSocket('ws://localhost:3000');
+    //连接成功
+    socket.addEventListener('open',function (event){
+      socket.send(name + " 进入了课堂");
+    });
+  
+    //监听消息并把来自服务器的消息显示在页面上
+    socket.addEventListener('message',function (event){
+      $('textarea').val($('textarea').val()+'\n\n ' +event.data)
+    });
+  
+    $("#sendBtn").click(function(){
+      //向服务器发送消息
+      var date = new Date();
+      var hour = date.getHours();
+      var minute = date.getMinutes();
+      var second = date.getSeconds();
+      var time = hour+":"+minute+":"+second;
+      var message = $('input').val();
+
+      socket.send(time + " " + name+ " : " +message);
+      $('textarea').val($('textarea').val()+'\n\n' +time+ ' you :' +message)
+      
+      //清空输入框
+      $('input').val("");
+    });
+  </script>
+  
 </html>
