@@ -20,6 +20,8 @@
     "electron": "^8.2.3"
   },
   "dependencies": {
+    "fluent-ffmpeg": "^2.1.2",
+    "websocket-stream": "^5.5.2",
     "ws": "^7.2.3"
   }
 }
